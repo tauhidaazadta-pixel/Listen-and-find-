@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Listen & Find - Suno Aur Pehchano</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      --text: #2d3436;
+      --purple: #6c5ce7;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      height: 100dvh;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    /* --- SCREENS --- */
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.4s ease;
+    }
+    .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+    /* --- START SCREEN --- */
+    #startScreen { text-align: center; }
+    .title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 3.5rem;
+      color: #fff;
+      text-shadow: 3px 3px 0 #6c5ce7, 6px 6px 0 rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+    .subtitle {
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: 900;
+      margin-bottom: 30px;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+    .big-btn {
+      background: linear-gradient(to bottom, #00b894, #00cec9);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 20px 50px;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #008f72;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .big-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 #008f72; }
+
+    /* --- GAME SCREEN --- */
+    #gameScreen {
+      justify-content: flex-start;
+      padding-top: 20px;
+      overflow-y: auto;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+    
+    .score-box {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.4rem;
+      color: var(--purple);
+      background: rgba(255,255,255,0.9);
+      padding: 8px 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+    }
+
+    /* Big Speaker Button Area */
+    .speaker-area {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .question-text {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem;
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .play-btn {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #fff;
+      border: 6px solid #a29bfe;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 4rem;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      transition: transform 0.2s;
+      animation: pulse-ring 2s infinite;
+    }
+    .play-btn:active { transform: scale(0.9); }
+    .play-btn.playing { animation: shake 0.5s; }
+
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(162, 155, 254, 0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(162, 155, 254, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(162, 155, 254, 0); }
+    }
+    @keyframes shake {
+      0%,100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
+
+    /* Options Area */
+    .options-area {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .opt-btn {
+      background: #fff;
+      border: 4px solid #fff;
+      border-radius: 20px;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #dfe6e9;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .opt-btn:active { 
+      transform: translateY(8px); 
+      box-shadow: 0 0px 0 #dfe6e9; 
+    }
+
+    .opt-emoji { font-size: 3.5rem; margin-bottom: 5px; }
+    .opt-name { font-size: 0.9rem; font-weight: 900; color: var(--purple); }
+
+    .opt-btn.correct {
+      background: #d4edda;
+      border-color: #00b894;
+      box-shadow: 0 8px 0 #00b894;
+      animation: pop 0.4s ease;
+    }
+    .opt-btn.wrong {
+      background: #f8d7da;
+      border-color: #dc3545;
+      box-shadow: 0 8px 0 #dc3545;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.1);} 100%{transform:scale(1);} }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      font-size: 2rem;
+      pointer-events: none;
+      z-index: 9999;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* --- WIN SCREEN --- */
+    #winScreen h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 3.5rem;
+      color: #fff;
+      text-shadow: 2px 2px 0 #00b894, 4px 4px 0 rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+    .star-icon {
+      font-size: 6rem;
+      animation: bounce 1s infinite alternate;
+      margin: 20px 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 1. START SCREEN -->
+  <div id="startScreen" class="screen active">
+    <h1 class="title">Listen<br>& Find</h1>
+    <p class="subtitle">आवाज़ सुनो और सही जानवर चुनो! 👂</p>
+    <button class="big-btn" onclick="startGame()">शुरू करें</button>
+  </div>
+
+  <!-- 2. GAME SCREEN -->
+  <div id="gameScreen" class="screen">
+    <div class="header">
+      <div class="score-box">Score: <span id="score">0</span></div>
+      <div class="score-box">Round: <span id="round">1</span>/10</div>
+    </div>
+
+    <div class="speaker-area">
+      <div class="question-text">सुनो और पहचानो (Listen!)</div>
+      <button class="play-btn" id="playBtn" onclick="playCurrentSound()">🔊</button>
+    </div>
+
+    <div class="options-area" id="optionsArea">
+      <!-- Options will be generated here -->
+    </div>
+  </div>
+
+  <!-- 3. WIN SCREEN -->
+  <div id="winScreen" class="screen">
+    <h1 class="title">शाबाश!</h1>
+    <div class="star-icon">🎧</div>
+    <p class="subtitle" id="winText">तुमने सारी आवाज़ें पहचान लीं!</p>
+    <button class="big-btn" onclick="startGame()" style="margin-top: 20px;">फिर से खेलें 🔄</button>
+  </div>
+
+  <script>
+    /* =========================================================
+       1. DATA & STATE
+       ========================================================= */
+    const ITEM_POOL = [
+      { id: 'dog', icon: '🐶', name: 'Dog', sound: 'bark' },
+      { id: 'cat', icon: '🐱', name: 'Cat', sound: 'meow' },
+      { id: 'cow', icon: '🐮', name: 'Cow', sound: 'moo' },
+      { id: 'lion', icon: '🦁', name: 'Lion', sound: 'roar' },
+      { id: 'elephant', icon: '🐘', name: 'Elephant', sound: 'trumpet' },
+      { id: 'duck', icon: '🦆', name: 'Duck', sound: 'quack' },
+      { id: 'hen', icon: '🐔', name: 'Hen', sound: 'cluck' },
+      { id: 'car', icon: '🚗', name: 'Car', sound: 'engine' },
+      { id: 'fire', icon: '🚒', name: 'Fire Engine', sound: 'siren' },
+      { id: 'bike', icon: '🚲', name: 'Bicycle', sound: 'bell' },
+      { id: 'train', icon: '🚂', name: 'Train', sound: 'train' },
+      { id: 'sheep', icon: '🐑', name: 'Sheep', sound: 'baa' },
+      { id: 'horse', icon: '🐴', name: 'Horse', sound: 'neigh' }
+    ];
+
+    let score = 0;
+    let round = 1;
+    const MAX_ROUNDS = 10;
+    let isAnswering = false;
+    let currentCorrectItem = null;
+
+    const optionsArea = document.getElementById('optionsArea');
+    const scoreEl = document.getElementById('score');
+    const roundEl = document.getElementById('round');
+    const playBtn = document.getElementById('playBtn');
+    
+    const screens = {
+      start: document.getElementById('startScreen'),
+      game: document.getElementById('gameScreen'),
+      win: document.getElementById('winScreen')
+    };
+
+    /* =========================================================
+       2. WEB AUDIO SYNTHESIZER (Magic Sounds)
+       ========================================================= */
+    const SOUNDS = {
+      bark: [{f:250,f2:110,d:.14,type:"sawtooth",gain:.20},{f:240,f2:100,d:.16,t:.22,type:"sawtooth",gain:.20}],
+      meow: [{f:520,f2:820,d:.20,type:"triangle"},{f:820,f2:460,d:.34,t:.20,type:"triangle"}],
+      moo: [{f:170,f2:130,d:.75,type:"sawtooth",vib:5,vibDepth:12,gain:.18}],
+      roar: [{f:170,f2:75,d:.85,type:"sawtooth",vib:7,vibDepth:22,gain:.22}],
+      trumpet: [{f:280,f2:520,d:.35,type:"sawtooth",gain:.14},{f:520,f2:360,d:.40,t:.34,type:"sawtooth",gain:.14}],
+      quack: [{f:340,f2:200,d:.13,type:"square",gain:.14},{f:340,f2:200,d:.13,t:.20,type:"square",gain:.14}],
+      cluck: [{f:600,f2:400,d:.08,type:"square",gain:.12},{f:500,f2:350,d:.10,t:.12,type:"square",gain:.12},{f:600,f2:400,d:.08,t:.26,type:"square",gain:.10}],
+      baa: [{f:400,f2:340,d:.55,type:"sawtooth",vib:11,vibDepth:28,gain:.13}],
+      neigh: [{f:720,f2:300,d:.55,type:"sawtooth",vib:17,vibDepth:55,gain:.16}],
+      engine: [{f:110,f2:220,d:.50,type:"sawtooth",vib:18,vibDepth:25,gain:.14},{f:200,f2:120,d:.40,t:.45,type:"sawtooth",vib:14,vibDepth:20,gain:.12}],
+      siren: [{f:500,f2:900,d:.30,type:"square",gain:.09},{f:900,f2:500,d:.30,t:.30,type:"square",gain:.09},{f:500,f2:900,d:.30,t:.60,type:"square",gain:.09}],
+      bell: [{f:2200,d:.15,type:"sine",gain:.10},{f:2200,d:.20,t:.20,type:"sine",gain:.10}],
+      train: [{f:600,f2:800,d:.25,type:"triangle",gain:.12},{f:700,f2:900,d:.35,t:.28,type:"triangle",gain:.12}]
+    };
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSynthSound(soundKey) {
+      if (!audioCtx) return;
+      const notes = SOUNDS[soundKey];
+      if (!notes) return;
+
+      const start = audioCtx.currentTime + 0.02;
+      playBtn.classList.add('playing');
+      setTimeout(() => playBtn.classList.remove('playing'), 500);
+
+      notes.forEach(n => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const t0 = start + (n.t || 0);
+        const dur = n.d || 0.2;
+
+        osc.type = n.type || "sine";
+        osc.frequency.setValueAtTime(Math.max(20, n.f), t0);
+        if (n.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(20, n.f2), t0 + dur);
+
+        if (n.vib) {
+          const lfo = audioCtx.createOscillator();
+          const lfoGain = audioCtx.createGain();
+          lfo.frequency.value = n.vib;
+          lfoGain.gain.value = n.vibDepth || 20;
+          lfo.connect(lfoGain).connect(osc.frequency);
+          lfo.start(t0);
+          lfo.stop(t0 + dur + 0.05);
+        }
+
+        const peak = n.gain ?? 0.18;
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(peak, t0 + Math.min(0.03, dur / 3));
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.05);
+      });
+    }
+
+    // UI / Success Sounds
+    function sfxCorrect() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+    
+    function sfxWrong() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = 0.85;
+      speechSynthesis.speak(utt);
+    }
+
+    /* =========================================================
+       3. GAME LOGIC
+       ========================================================= */
+    function showScreen(name) {
+      Object.values(screens).forEach(s => s.classList.remove('active'));
+      screens[name].classList.add('active');
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startGame() {
+      initAudio();
+      score = 0;
+      round = 1;
+      isAnswering = false;
+      scoreEl.textContent = score;
+      
+      showScreen('game');
+      loadRound();
+    }
+
+    function loadRound() {
+      if (round > MAX_ROUNDS) {
+        winGame();
+        return;
+      }
+
+      roundEl.textContent = round;
+      isAnswering = false;
+
+      // Pick 1 correct item and 2 wrong items
+      const shuffledItems = shuffle([...ITEM_POOL]);
+      currentCorrectItem = shuffledItems[0];
+      const wrongItems = [shuffledItems[1], shuffledItems[2]];
+      
+      const options = shuffle([currentCorrectItem, ...wrongItems]);
+
+      // Render Options
+      optionsArea.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerHTML = `
+          <span class="opt-emoji">${opt.icon}</span>
+          <span class="opt-name">${opt.name}</span>
+        `;
+        btn.onclick = () => handleAnswer(btn, opt.id);
+        optionsArea.appendChild(btn);
+      });
+
+      // Auto-play sound after a slight delay
+      setTimeout(() => {
+        playSynthSound(currentCorrectItem.sound);
+      }, 600);
+    }
+
+    function playCurrentSound() {
+      if (currentCorrectItem) {
+        playSynthSound(currentCorrectItem.sound);
+      }
+    }
+
+    function handleAnswer(btn, selectedId) {
+      if (isAnswering) return;
+
+      if (selectedId === currentCorrectItem.id) {
+        // CORRECT
+        isAnswering = true;
+        btn.classList.add('correct');
+        sfxCorrect();
+        score += 10;
+        scoreEl.textContent = score;
+
+        // Play the sound again for confirmation
+        playSynthSound(currentCorrectItem.sound);
+        createConfetti(15);
+
+        // Next round after delay
+        setTimeout(() => {
+          round++;
+          loadRound();
+        }, 1800);
+
+      } else {
+        // WRONG
+        sfxWrong();
+        btn.classList.add('wrong');
+        
+        setTimeout(() => {
+          btn.classList.remove('wrong');
+        }, 400);
+      }
+    }
+
+    function winGame() {
+      showScreen('win');
+      speak("Amazing! You have super ears!");
+      createConfetti(60);
+    }
+
+    /* =========================================================
+       4. VISUAL EFFECTS
+       ========================================================= */
+    function createConfetti(count = 40) {
+      const icons = ['⭐', '🌟', '✨', '🎈', '🎉', '🎵'];
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.textContent = icons[Math.floor(Math.random() * icons.length)];
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.top = '-50px';
+        c.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+        c.style.fontSize = (Math.random() * 20 + 20) + 'px';
+        
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3500);
+      }
+    }
+
+    if ("speechSynthesis" in window) {
+      speechSynthesis.getVoices();
+    }
+
+  </script>
+</body>
+</html>
