@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Listen & Find - Suno Aur Pehchano</title>
+  <title>Listen & Find - Clear Sounds</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -262,22 +262,19 @@
 
   <script>
     /* =========================================================
-       1. DATA & STATE
+       1. DATA & STATE (Using Real Audio URLs + TTS text)
        ========================================================= */
     const ITEM_POOL = [
-      { id: 'dog', icon: '🐶', name: 'Dog', sound: 'bark' },
-      { id: 'cat', icon: '🐱', name: 'Cat', sound: 'meow' },
-      { id: 'cow', icon: '🐮', name: 'Cow', sound: 'moo' },
-      { id: 'lion', icon: '🦁', name: 'Lion', sound: 'roar' },
-      { id: 'elephant', icon: '🐘', name: 'Elephant', sound: 'trumpet' },
-      { id: 'duck', icon: '🦆', name: 'Duck', sound: 'quack' },
-      { id: 'hen', icon: '🐔', name: 'Hen', sound: 'cluck' },
-      { id: 'car', icon: '🚗', name: 'Car', sound: 'engine' },
-      { id: 'fire', icon: '🚒', name: 'Fire Engine', sound: 'siren' },
-      { id: 'bike', icon: '🚲', name: 'Bicycle', sound: 'bell' },
-      { id: 'train', icon: '🚂', name: 'Train', sound: 'train' },
-      { id: 'sheep', icon: '🐑', name: 'Sheep', sound: 'baa' },
-      { id: 'horse', icon: '🐴', name: 'Horse', sound: 'neigh' }
+      { id: 'dog', icon: '🐶', name: 'Dog', url: 'https://actions.google.com/sounds/v1/animals/dog_bark_close.ogg', text: 'Woof Woof' },
+      { id: 'cat', icon: '🐱', name: 'Cat', url: 'https://actions.google.com/sounds/v1/animals/cat_meow_close.ogg', text: 'Meow' },
+      { id: 'cow', icon: '🐮', name: 'Cow', url: 'https://actions.google.com/sounds/v1/animals/cow_moo.ogg', text: 'Moo' },
+      { id: 'lion', icon: '🦁', name: 'Lion', url: 'https://actions.google.com/sounds/v1/animals/lion_roar.ogg', text: 'Roar' },
+      { id: 'elephant', icon: '🐘', name: 'Elephant', url: 'https://actions.google.com/sounds/v1/animals/elephant_trumpet.ogg', text: 'Trumpet' },
+      { id: 'duck', icon: '🦆', name: 'Duck', url: 'https://actions.google.com/sounds/v1/animals/duck_quack.ogg', text: 'Quack Quack' },
+      { id: 'car', icon: '🚗', name: 'Car', url: 'https://actions.google.com/sounds/v1/transportation/car_idling.ogg', text: 'Vroom Vroom' },
+      { id: 'fire', icon: '🚒', name: 'Fire Engine', url: 'https://actions.google.com/sounds/v1/alarms/police_siren.ogg', text: 'Wee-oo Wee-oo' },
+      { id: 'train', icon: '🚂', name: 'Train', url: 'https://actions.google.com/sounds/v1/transportation/train_horn.ogg', text: 'Choo Choo' },
+      { id: 'sheep', icon: '🐑', name: 'Sheep', url: 'https://actions.google.com/sounds/v1/animals/sheep_bleat.ogg', text: 'Baa Baa' }
     ];
 
     let score = 0;
@@ -298,96 +295,59 @@
     };
 
     /* =========================================================
-       2. WEB AUDIO SYNTHESIZER (Magic Sounds)
+       2. AUDIO & SPEECH
        ========================================================= */
-    const SOUNDS = {
-      bark: [{f:250,f2:110,d:.14,type:"sawtooth",gain:.20},{f:240,f2:100,d:.16,t:.22,type:"sawtooth",gain:.20}],
-      meow: [{f:520,f2:820,d:.20,type:"triangle"},{f:820,f2:460,d:.34,t:.20,type:"triangle"}],
-      moo: [{f:170,f2:130,d:.75,type:"sawtooth",vib:5,vibDepth:12,gain:.18}],
-      roar: [{f:170,f2:75,d:.85,type:"sawtooth",vib:7,vibDepth:22,gain:.22}],
-      trumpet: [{f:280,f2:520,d:.35,type:"sawtooth",gain:.14},{f:520,f2:360,d:.40,t:.34,type:"sawtooth",gain:.14}],
-      quack: [{f:340,f2:200,d:.13,type:"square",gain:.14},{f:340,f2:200,d:.13,t:.20,type:"square",gain:.14}],
-      cluck: [{f:600,f2:400,d:.08,type:"square",gain:.12},{f:500,f2:350,d:.10,t:.12,type:"square",gain:.12},{f:600,f2:400,d:.08,t:.26,type:"square",gain:.10}],
-      baa: [{f:400,f2:340,d:.55,type:"sawtooth",vib:11,vibDepth:28,gain:.13}],
-      neigh: [{f:720,f2:300,d:.55,type:"sawtooth",vib:17,vibDepth:55,gain:.16}],
-      engine: [{f:110,f2:220,d:.50,type:"sawtooth",vib:18,vibDepth:25,gain:.14},{f:200,f2:120,d:.40,t:.45,type:"sawtooth",vib:14,vibDepth:20,gain:.12}],
-      siren: [{f:500,f2:900,d:.30,type:"square",gain:.09},{f:900,f2:500,d:.30,t:.30,type:"square",gain:.09},{f:500,f2:900,d:.30,t:.60,type:"square",gain:.09}],
-      bell: [{f:2200,d:.15,type:"sine",gain:.10},{f:2200,d:.20,t:.20,type:"sine",gain:.10}],
-      train: [{f:600,f2:800,d:.25,type:"triangle",gain:.12},{f:700,f2:900,d:.35,t:.28,type:"triangle",gain:.12}]
-    };
+    let currentAudio = null; // To stop previous audio if playing
 
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
+    function playSound(item) {
+      if (!item) return;
 
-    function initAudio() {
-      if (!audioCtx) audioCtx = new AudioContext();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    function playSynthSound(soundKey) {
-      if (!audioCtx) return;
-      const notes = SOUNDS[soundKey];
-      if (!notes) return;
-
-      const start = audioCtx.currentTime + 0.02;
-      playBtn.classList.add('playing');
-      setTimeout(() => playBtn.classList.remove('playing'), 500);
-
-      notes.forEach(n => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const t0 = start + (n.t || 0);
-        const dur = n.d || 0.2;
-
-        osc.type = n.type || "sine";
-        osc.frequency.setValueAtTime(Math.max(20, n.f), t0);
-        if (n.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(20, n.f2), t0 + dur);
-
-        if (n.vib) {
-          const lfo = audioCtx.createOscillator();
-          const lfoGain = audioCtx.createGain();
-          lfo.frequency.value = n.vib;
-          lfoGain.gain.value = n.vibDepth || 20;
-          lfo.connect(lfoGain).connect(osc.frequency);
-          lfo.start(t0);
-          lfo.stop(t0 + dur + 0.05);
-        }
-
-        const peak = n.gain ?? 0.18;
-        gain.gain.setValueAtTime(0.0001, t0);
-        gain.gain.exponentialRampToValueAtTime(peak, t0 + Math.min(0.03, dur / 3));
-        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(t0);
-        osc.stop(t0 + dur + 0.05);
+      // 1. Play Real Audio File
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+      
+      currentAudio = new Audio(item.url);
+      currentAudio.volume = 1.0; // Full volume
+      
+      currentAudio.play().catch(e => {
+        console.log("Audio blocked or failed to load. Browser might need user interaction first.");
       });
+      
+      playBtn.classList.add('playing');
+      setTimeout(() => playBtn.classList.remove('playing'), 600);
+
+      // 2. Speak the text loudly and clearly using TTS
+      speak(item.text);
     }
 
     // UI / Success Sounds
     function sfxCorrect() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-      osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.setValueAtTime(800, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start(); osc.stop(ctx.currentTime + 0.3);
     }
     
     function sfxWrong() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+      osc.start(); osc.stop(ctx.currentTime + 0.2);
     }
 
     function speak(text) {
@@ -396,6 +356,12 @@
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = 'en-US';
       utt.rate = 0.85;
+      utt.volume = 1.0; // Full volume for voice
+      
+      const voices = speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Samantha')));
+      if (preferred) utt.voice = preferred;
+      
       speechSynthesis.speak(utt);
     }
 
@@ -416,7 +382,6 @@
     }
 
     function startGame() {
-      initAudio();
       score = 0;
       round = 1;
       isAnswering = false;
@@ -457,13 +422,13 @@
 
       // Auto-play sound after a slight delay
       setTimeout(() => {
-        playSynthSound(currentCorrectItem.sound);
+        playSound(currentCorrectItem);
       }, 600);
     }
 
     function playCurrentSound() {
       if (currentCorrectItem) {
-        playSynthSound(currentCorrectItem.sound);
+        playSound(currentCorrectItem);
       }
     }
 
@@ -478,15 +443,13 @@
         score += 10;
         scoreEl.textContent = score;
 
-        // Play the sound again for confirmation
-        playSynthSound(currentCorrectItem.sound);
+        playSound(currentCorrectItem);
         createConfetti(15);
 
-        // Next round after delay
         setTimeout(() => {
           round++;
           loadRound();
-        }, 1800);
+        }, 2000);
 
       } else {
         // WRONG
@@ -527,7 +490,6 @@
     if ("speechSynthesis" in window) {
       speechSynthesis.getVoices();
     }
-
   </script>
 </body>
 </html>
