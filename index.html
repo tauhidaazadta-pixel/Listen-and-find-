@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Listen & Find - Clear Sounds</title>
+  <title>Listen & Find - Real Sounds</title>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -231,7 +231,7 @@
   <!-- 1. START SCREEN -->
   <div id="startScreen" class="screen active">
     <h1 class="title">Listen<br>& Find</h1>
-    <p class="subtitle">आवाज़ सुनो और सही जानवर चुनो! 👂</p>
+    <p class="subtitle">आवाज़ सुनो और सही चुनो! 👂</p>
     <button class="big-btn" onclick="startGame()">शुरू करें</button>
   </div>
 
@@ -262,19 +262,19 @@
 
   <script>
     /* =========================================================
-       1. DATA & STATE (Using Real Audio URLs + TTS text)
+       1. DATA & STATE (High-Quality Real MP3 Sounds)
        ========================================================= */
     const ITEM_POOL = [
-      { id: 'dog', icon: '🐶', name: 'Dog', url: 'https://actions.google.com/sounds/v1/animals/dog_bark_close.ogg', text: 'Woof Woof' },
-      { id: 'cat', icon: '🐱', name: 'Cat', url: 'https://actions.google.com/sounds/v1/animals/cat_meow_close.ogg', text: 'Meow' },
-      { id: 'cow', icon: '🐮', name: 'Cow', url: 'https://actions.google.com/sounds/v1/animals/cow_moo.ogg', text: 'Moo' },
-      { id: 'lion', icon: '🦁', name: 'Lion', url: 'https://actions.google.com/sounds/v1/animals/lion_roar.ogg', text: 'Roar' },
-      { id: 'elephant', icon: '🐘', name: 'Elephant', url: 'https://actions.google.com/sounds/v1/animals/elephant_trumpet.ogg', text: 'Trumpet' },
-      { id: 'duck', icon: '🦆', name: 'Duck', url: 'https://actions.google.com/sounds/v1/animals/duck_quack.ogg', text: 'Quack Quack' },
-      { id: 'car', icon: '🚗', name: 'Car', url: 'https://actions.google.com/sounds/v1/transportation/car_idling.ogg', text: 'Vroom Vroom' },
-      { id: 'fire', icon: '🚒', name: 'Fire Engine', url: 'https://actions.google.com/sounds/v1/alarms/police_siren.ogg', text: 'Wee-oo Wee-oo' },
-      { id: 'train', icon: '🚂', name: 'Train', url: 'https://actions.google.com/sounds/v1/transportation/train_horn.ogg', text: 'Choo Choo' },
-      { id: 'sheep', icon: '🐑', name: 'Sheep', url: 'https://actions.google.com/sounds/v1/animals/sheep_bleat.ogg', text: 'Baa Baa' }
+      { id: 'dog', icon: '🐶', name: 'Dog', url: 'https://assets.mixkit.co/active_storage/sfx/219/219-preview.mp3', text: 'Woof Woof' },
+      { id: 'cat', icon: '🐱', name: 'Cat', url: 'https://assets.mixkit.co/active_storage/sfx/220/220-preview.mp3', text: 'Meow' },
+      { id: 'cow', icon: '🐮', name: 'Cow', url: 'https://assets.mixkit.co/active_storage/sfx/221/221-preview.mp3', text: 'Moo' },
+      { id: 'lion', icon: '🦁', name: 'Lion', url: 'https://assets.mixkit.co/active_storage/sfx/224/224-preview.mp3', text: 'Roar' },
+      { id: 'elephant', icon: '🐘', name: 'Elephant', url: 'https://assets.mixkit.co/active_storage/sfx/222/222-preview.mp3', text: 'Trumpet' },
+      { id: 'duck', icon: '🦆', name: 'Duck', url: 'https://assets.mixkit.co/active_storage/sfx/223/223-preview.mp3', text: 'Quack Quack' },
+      { id: 'car', icon: '🚗', name: 'Car', url: 'https://assets.mixkit.co/active_storage/sfx/2609/2609-preview.mp3', text: 'Vroom Vroom' },
+      { id: 'train', icon: '🚂', name: 'Train', url: 'https://assets.mixkit.co/active_storage/sfx/2644/2644-preview.mp3', text: 'Choo Choo' },
+      { id: 'police', icon: '🚓', name: 'Police Car', url: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', text: 'Wee-oo Wee-oo' },
+      { id: 'bell', icon: '🚲', name: 'Bicycle', url: 'https://assets.mixkit.co/active_storage/sfx/2559/2559-preview.mp3', text: 'Ring Ring' }
     ];
 
     let score = 0;
@@ -282,6 +282,8 @@
     const MAX_ROUNDS = 10;
     let isAnswering = false;
     let currentCorrectItem = null;
+    let currentAudio = null;
+    let audioUnlocked = false;
 
     const optionsArea = document.getElementById('optionsArea');
     const scoreEl = document.getElementById('score');
@@ -295,9 +297,19 @@
     };
 
     /* =========================================================
-       2. AUDIO & SPEECH
+       2. REAL AUDIO & SPEECH ENGINE
        ========================================================= */
-    let currentAudio = null; // To stop previous audio if playing
+    
+    // Unlock audio system on first click (Required for Mobile Browsers like Edge)
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      // Create a silent empty audio to unlock the audio channel
+      const silentAudio = new Audio("data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA");
+      silentAudio.play().then(() => {
+        audioUnlocked = true;
+        console.log("Audio unlocked!");
+      }).catch(e => console.log("Audio unlock failed, but will try direct play."));
+    }
 
     function playSound(item) {
       if (!item) return;
@@ -309,25 +321,40 @@
       }
       
       currentAudio = new Audio(item.url);
-      currentAudio.volume = 1.0; // Full volume
+      currentAudio.volume = 1.0; 
       
+      // Attempt to play. Mobile browsers might block if not unlocked.
       currentAudio.play().catch(e => {
-        console.log("Audio blocked or failed to load. Browser might need user interaction first.");
+        console.log("Audio play error:", e);
       });
       
+      // Visual feedback
       playBtn.classList.add('playing');
       setTimeout(() => playBtn.classList.remove('playing'), 600);
 
-      // 2. Speak the text loudly and clearly using TTS
+      // 2. Speak the sound word (Text-to-Speech)
       speak(item.text);
     }
 
-    // UI / Success Sounds
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = 0.9;
+      utt.volume = 1.0;
+      
+      const voices = speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Samantha')));
+      if (preferred) utt.voice = preferred;
+      
+      speechSynthesis.speak(utt);
+    }
+
+    // UI Sounds
     function sfxCorrect() {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -338,31 +365,14 @@
     }
     
     function sfxWrong() {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(200, ctx.currentTime);
       gain.gain.setValueAtTime(0.15, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
       osc.start(); osc.stop(ctx.currentTime + 0.2);
-    }
-
-    function speak(text) {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = 'en-US';
-      utt.rate = 0.85;
-      utt.volume = 1.0; // Full volume for voice
-      
-      const voices = speechSynthesis.getVoices();
-      const preferred = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Samantha')));
-      if (preferred) utt.voice = preferred;
-      
-      speechSynthesis.speak(utt);
     }
 
     /* =========================================================
@@ -382,6 +392,9 @@
     }
 
     function startGame() {
+      // Unlock audio on user gesture
+      unlockAudio();
+      
       score = 0;
       round = 1;
       isAnswering = false;
@@ -427,6 +440,7 @@
     }
 
     function playCurrentSound() {
+      unlockAudio();
       if (currentCorrectItem) {
         playSound(currentCorrectItem);
       }
@@ -449,7 +463,7 @@
         setTimeout(() => {
           round++;
           loadRound();
-        }, 2000);
+        }, 2200);
 
       } else {
         // WRONG
